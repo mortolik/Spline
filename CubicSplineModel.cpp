@@ -2,7 +2,8 @@
 #include <QtMath>
 
 #include "CubicSplineModel.hpp"
-
+namespace Spline
+{
 CubicSplineModel::CubicSplineModel(QObject *parent)
     : QObject(parent)
 {
@@ -112,4 +113,4 @@ double CubicSplineModel::function(double x) const
 {
     return qLn(x + 1) / (x + 1);
 }
-
+}

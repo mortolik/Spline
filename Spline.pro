@@ -1,4 +1,5 @@
 QT       += core gui
+QT       += widgets charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,11 +11,13 @@ CONFIG += c++17
 
 SOURCES += \
     CubicSplineModel.cpp \
+    CubicSplineWidget.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     CubicSplineModel.hpp \
+    CubicSplineWidget.hpp \
     mainwindow.h
 
 FORMS += \

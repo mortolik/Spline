@@ -2,6 +2,9 @@
 
 #include <QObject>
 
+namespace Spline
+{
+
 class CubicSplineModel : public QObject
 {
     Q_OBJECT
@@ -17,6 +20,7 @@ public:
     QVector<double> getCoefficientsB() const;
     QVector<double> getCoefficientsC() const;
     QVector<double> getCoefficientsD() const;
+    double function(double x) const;
 
 signals:
     void splineUpdated();
@@ -25,5 +29,5 @@ private:
     QVector<double> x, y;
     QVector<double> a, b, c, d;
 
-    double function(double x) const;
 };
+}
