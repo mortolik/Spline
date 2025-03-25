@@ -9,14 +9,37 @@ CubicSplineModel::CubicSplineModel(QObject *parent)
 {
 }
 
+void CubicSplineModel::setInterval(double a, double b)
+{
+    if (a >= b)
+    {
+        qWarning() << "Ошибка: a должно быть меньше b!";
+        return;
+    }
+    intervalA = a;
+    intervalB = b;
+}
+
+double CubicSplineModel::getIntervalA() const
+{
+    return intervalA;
+}
+
+double CubicSplineModel::getIntervalB() const
+{
+    return intervalB;
+}
+
 void CubicSplineModel::setPoints(int n)
 {
-    if (n < 2) {
+    if (n < 2)
+    {
         qWarning() << "Ошибка: n должно быть >= 2!";
         return;
     }
 
-    double a = 0.2, b = 2.0;
+    double a = intervalA;
+    double b = intervalB;
     x.clear();
     y.clear();
     x.resize(n + 1);
@@ -42,7 +65,8 @@ void CubicSplineModel::computeSpline()
     d.resize(n);
 
     QVector<double> h(n);
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i)
+    {
         h[i] = x[i + 1] - x[i];
     }
 

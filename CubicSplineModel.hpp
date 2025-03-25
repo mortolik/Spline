@@ -24,12 +24,19 @@ public:
 
     double function(double x) const;
 
+    void setInterval(double a, double b);
+    double getIntervalA() const;
+    double getIntervalB() const;
+
 signals:
     void splineUpdated();
 
 private:
     QVector<double> x, y;
     QVector<double> a, b, c, d;
+
+    double intervalA = 0.2;
+    double intervalB = 2.0;
 
 };
 }

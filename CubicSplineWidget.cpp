@@ -1,10 +1,10 @@
-
 #include <QVBoxLayout>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
-#include "CubicSplineWidget.hpp"
+
 #include "CubicSplineModel.hpp"
+#include "CubicSplineWidget.hpp"
 namespace Spline
 {
 CubicSplineWidget::CubicSplineWidget(QWidget *parent)
@@ -21,12 +21,18 @@ CubicSplineWidget::CubicSplineWidget(QWidget *parent)
     QValueAxis *axisX = new QValueAxis();
     QValueAxis *axisY = new QValueAxis();
 
+    axisX->setTitleText("X");
+    axisY->setTitleText("Y");
+
     chart->addAxis(axisX, Qt::AlignBottom);
     chart->addAxis(axisY, Qt::AlignLeft);
     functionSeries->attachAxis(axisX);
     functionSeries->attachAxis(axisY);
     splineSeries->attachAxis(axisX);
     splineSeries->attachAxis(axisY);
+
+    functionSeries->setName("Оригинальная функция");
+    splineSeries->setName("Кубический сплайн");
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(chartView);
@@ -41,7 +47,7 @@ void CubicSplineWidget::setModel(CubicSplineModel *model)
 }
 
 void CubicSplineWidget::updateChart()
-{
+ {
     if (!splineModel)
         return;
 
@@ -49,15 +55,24 @@ void CubicSplineWidget::updateChart()
     splineSeries->clear();
 
     int points = 100;
-    double a = 0.2, b = 2.0;
+    double a = splineModel->getIntervalA(); 
+    double b = splineModel->getIntervalB();
     double step = (b - a) / points;
 
-    for (int i = 0; i <= points; ++i)
-    {
+    for (int i = 0; i <= points; ++i) 
+{
         double x = a + i * step;
         functionSeries->append(x, splineModel->function(x));
         splineSeries->append(x, splineModel->evaluate(x));
     }
+
+
+    chart->createDefaultAxes();
+    chart->axes(Qt::Horizontal).first()->setRange(a, b);
+    chart->axes(Qt::Vertical).first()->setRange(
+        qMin(functionSeries->points().first().y(), splineSeries->points().first().y()),
+        qMax(functionSeries->points().last().y(), splineSeries->points().last().y())
+        );
 
     chart->update();
 }
