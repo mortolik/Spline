@@ -9,7 +9,9 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
+
     setupUI();
+    setMinimumSize(800, 600);
 }
 
 MainWindow::~MainWindow()
@@ -33,7 +35,7 @@ void MainWindow::setupUI()
     updateButton = new QPushButton("Построить сплайн", this);
 
     coeffTable = new QTableWidget(this);
-    coeffTable->setColumnCount(5);
+    coeffTable->setColumnCount(7);
     coeffTable->setHorizontalHeaderLabels({"i", "xi-1", "xi", "ai", "bi", "ci", "di"});
 
     layout->addWidget(nSpinBox);
@@ -55,10 +57,13 @@ void MainWindow::updateSpline()
 
 void MainWindow::updateTable()
 {
+    QVector<double> xValues = splineModel->getX();
+
     QVector<double> a = splineModel->getCoefficientsA();
     QVector<double> b = splineModel->getCoefficientsB();
     QVector<double> c = splineModel->getCoefficientsC();
     QVector<double> d = splineModel->getCoefficientsD();
+
 
     int n = a.size() - 1;
     coeffTable->setRowCount(n);
@@ -66,9 +71,11 @@ void MainWindow::updateTable()
     for (int i = 0; i < n; ++i)
     {
         coeffTable->setItem(i, 0, new QTableWidgetItem(QString::number(i)));
-        coeffTable->setItem(i, 1, new QTableWidgetItem(QString::number(a[i])));
-        coeffTable->setItem(i, 2, new QTableWidgetItem(QString::number(b[i])));
-        coeffTable->setItem(i, 3, new QTableWidgetItem(QString::number(c[i])));
-        coeffTable->setItem(i, 4, new QTableWidgetItem(QString::number(d[i])));
+        coeffTable->setItem(i, 1, new QTableWidgetItem(QString::number(xValues[i])));
+        coeffTable->setItem(i, 2, new QTableWidgetItem(QString::number(xValues[i + 1])));
+        coeffTable->setItem(i, 3, new QTableWidgetItem(QString::number(a[i])));
+        coeffTable->setItem(i, 4, new QTableWidgetItem(QString::number(b[i])));
+        coeffTable->setItem(i, 5, new QTableWidgetItem(QString::number(c[i])));
+        coeffTable->setItem(i, 6, new QTableWidgetItem(QString::number(d[i])));
     }
 }

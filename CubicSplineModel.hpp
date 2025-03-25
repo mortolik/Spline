@@ -20,6 +20,8 @@ public:
     QVector<double> getCoefficientsB() const;
     QVector<double> getCoefficientsC() const;
     QVector<double> getCoefficientsD() const;
+    QVector<double> getX() const;
+
     double function(double x) const;
 
 signals:

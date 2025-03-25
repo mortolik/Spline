@@ -117,6 +117,11 @@ QVector<double> CubicSplineModel::getCoefficientsD() const
     return d;
 }
 
+QVector<double> CubicSplineModel::getX() const
+{
+    return x;
+}
+
 double CubicSplineModel::function(double x) const
 {
     return qLn(x + 1) / (x + 1);
