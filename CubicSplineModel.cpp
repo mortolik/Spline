@@ -11,7 +11,14 @@ CubicSplineModel::CubicSplineModel(QObject *parent)
 
 void CubicSplineModel::setPoints(int n)
 {
+    if (n < 2) {
+        qWarning() << "Ошибка: n должно быть >= 2!";
+        return;
+    }
+
     double a = 0.2, b = 2.0;
+    x.clear();
+    y.clear();
     x.resize(n + 1);
     y.resize(n + 1);
 
@@ -27,6 +34,8 @@ void CubicSplineModel::setPoints(int n)
 void CubicSplineModel::computeSpline()
 {
     int n = x.size() - 1;
+    if (n < 2) return;
+
     a = y;
     b.resize(n);
     c.resize(n + 1);
@@ -34,7 +43,6 @@ void CubicSplineModel::computeSpline()
 
     QVector<double> h(n);
     for (int i = 0; i < n; ++i) {
-
         h[i] = x[i + 1] - x[i];
     }
 
@@ -47,15 +55,15 @@ void CubicSplineModel::computeSpline()
         F[i] = 3.0 * ((a[i + 1] - a[i]) / h[i] - (a[i] - a[i - 1]) / h[i - 1]);
     }
 
-    B[0] = B[n] = 1;
-    C[0] = A[n] = 0;
-    F[0] = F[n] = 0;
+    B[0] = 1; B[n - 1] = 1;
+    C[0] = 0; A[n - 1] = 0;
+    F[0] = 0; F[n - 1] = 0;
 
     for (int i = 1; i < n - 1; ++i)
     {
-        double m = A[i + 1] / B[i];
-        B[i + 1] -= m * C[i];
-        F[i + 1] -= m * F[i];
+        double m = A[i] / B[i - 1];
+        B[i] -= m * C[i - 1];
+        F[i] -= m * F[i - 1];
     }
 
     c[n - 1] = F[n - 1] / B[n - 1];
