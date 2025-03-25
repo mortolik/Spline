@@ -24,59 +24,59 @@ void MainWindow::setupUI()
     QWidget *centralWidget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(centralWidget);
 
-    splineModel = new Spline::CubicSplineModel(this);
-    splineWidget = new Spline::CubicSplineWidget(this);
-    splineWidget->setModel(splineModel);
-    splineWidget->clearChart();
+    m_splineModel = new Spline::CubicSplineModel(this);
+    m_splineWidget = new Spline::CubicSplineWidget(this);
+    m_splineWidget->setModel(m_splineModel);
+    m_splineWidget->clearChart();
 
-    nSpinBox = new QSpinBox(this);
-    nSpinBox->setRange(2, 100);
-    nSpinBox->setValue(10);
+    m_nSpinBox = new QSpinBox(this);
+    m_nSpinBox->setRange(2, 100);
+    m_nSpinBox->setValue(10);
 
-    updateButton = new QPushButton("Построить сплайн", this);
+    m_updateButton = new QPushButton("Построить сплайн", this);
 
-    coeffTable = new QTableWidget(this);
-    coeffTable->setColumnCount(7);
-    coeffTable->setHorizontalHeaderLabels({"i", "xi-1", "xi", "ai", "bi", "ci", "di"});
+    m_coeffTable = new QTableWidget(this);
+    m_coeffTable->setColumnCount(7);
+    m_coeffTable->setHorizontalHeaderLabels({"i", "xi-1", "xi", "ai", "bi", "ci", "di"});
 
-    layout->addWidget(nSpinBox);
-    layout->addWidget(updateButton);
-    layout->addWidget(splineWidget);
-    layout->addWidget(coeffTable);
+    layout->addWidget(m_nSpinBox);
+    layout->addWidget(m_updateButton);
+    layout->addWidget(m_splineWidget);
+    layout->addWidget(m_coeffTable);
 
-    connect(updateButton, &QPushButton::clicked, this, &MainWindow::updateSpline);
+    connect(m_updateButton, &QPushButton::clicked, this, &MainWindow::updateSpline);
 
     setCentralWidget(centralWidget);
 }
 
 void MainWindow::updateSpline()
 {
-    int n = nSpinBox->value();
-    splineModel->setPoints(n);
+    int n = m_nSpinBox->value();
+    m_splineModel->setPoints(n);
     updateTable();
 }
 
 void MainWindow::updateTable()
 {
-    QVector<double> xValues = splineModel->getX();
+    QVector<double> xValues = m_splineModel->getX();
 
-    QVector<double> a = splineModel->getCoefficientsA();
-    QVector<double> b = splineModel->getCoefficientsB();
-    QVector<double> c = splineModel->getCoefficientsC();
-    QVector<double> d = splineModel->getCoefficientsD();
+    QVector<double> a = m_splineModel->getCoefficientsA();
+    QVector<double> b = m_splineModel->getCoefficientsB();
+    QVector<double> c = m_splineModel->getCoefficientsC();
+    QVector<double> d = m_splineModel->getCoefficientsD();
 
 
     int n = a.size() - 1;
-    coeffTable->setRowCount(n);
+    m_coeffTable->setRowCount(n);
 
     for (int i = 0; i < n; ++i)
     {
-        coeffTable->setItem(i, 0, new QTableWidgetItem(QString::number(i)));
-        coeffTable->setItem(i, 1, new QTableWidgetItem(QString::number(xValues[i])));
-        coeffTable->setItem(i, 2, new QTableWidgetItem(QString::number(xValues[i + 1])));
-        coeffTable->setItem(i, 3, new QTableWidgetItem(QString::number(a[i])));
-        coeffTable->setItem(i, 4, new QTableWidgetItem(QString::number(b[i])));
-        coeffTable->setItem(i, 5, new QTableWidgetItem(QString::number(c[i])));
-        coeffTable->setItem(i, 6, new QTableWidgetItem(QString::number(d[i])));
+        m_coeffTable->setItem(i, 0, new QTableWidgetItem(QString::number(i)));
+        m_coeffTable->setItem(i, 1, new QTableWidgetItem(QString::number(xValues[i])));
+        m_coeffTable->setItem(i, 2, new QTableWidgetItem(QString::number(xValues[i + 1])));
+        m_coeffTable->setItem(i, 3, new QTableWidgetItem(QString::number(a[i])));
+        m_coeffTable->setItem(i, 4, new QTableWidgetItem(QString::number(b[i])));
+        m_coeffTable->setItem(i, 5, new QTableWidgetItem(QString::number(c[i])));
+        m_coeffTable->setItem(i, 6, new QTableWidgetItem(QString::number(d[i])));
     }
 }

@@ -26,11 +26,11 @@ public:
 
 private:
 
-    Spline::CubicSplineModel *splineModel;
-    Spline::CubicSplineWidget *splineWidget;
-    QSpinBox *nSpinBox;
-    QPushButton *updateButton;
-    QTableWidget *coeffTable;
+    Spline::CubicSplineModel* m_splineModel;
+    Spline::CubicSplineWidget* m_splineWidget;
+    QSpinBox* m_nSpinBox;
+    QPushButton* m_updateButton;
+    QTableWidget* m_coeffTable;
 
     void setupUI();
     void updateSpline();

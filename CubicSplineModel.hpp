@@ -32,11 +32,11 @@ signals:
     void splineUpdated();
 
 private:
-    QVector<double> x, y;
-    QVector<double> a, b, c, d;
+    QVector<double> m_x, m_y;
+    QVector<double> m_a, m_b, m_c, m_d;
 
-    double intervalA = 0.2;
-    double intervalB = 2.0;
+    double m_intervalA = 0.2;
+    double m_intervalB = 2.0;
 
 };
 }

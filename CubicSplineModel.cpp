@@ -16,18 +16,18 @@ void CubicSplineModel::setInterval(double a, double b)
         qWarning() << "Ошибка: a должно быть меньше b!";
         return;
     }
-    intervalA = a;
-    intervalB = b;
+    m_intervalA = a;
+    m_intervalB = b;
 }
 
 double CubicSplineModel::getIntervalA() const
 {
-    return intervalA;
+    return m_intervalA;
 }
 
 double CubicSplineModel::getIntervalB() const
 {
-    return intervalB;
+    return m_intervalB;
 }
 
 void CubicSplineModel::setPoints(int n)
@@ -38,36 +38,36 @@ void CubicSplineModel::setPoints(int n)
         return;
     }
 
-    double a = intervalA;
-    double b = intervalB;
-    x.clear();
-    y.clear();
-    x.resize(n + 1);
-    y.resize(n + 1);
+    double a = m_intervalA;
+    double b = m_intervalB;
+    m_x.clear();
+    m_y.clear();
+    m_x.resize(n + 1);
+    m_y.resize(n + 1);
 
     double h = (b - a) / n;
     for (int i = 0; i <= n; ++i)
     {
-        x[i] = a + i * h;
-        y[i] = function(x[i]);
+        m_x[i] = a + i * h;
+        m_y[i] = function(m_x[i]);
     }
     computeSpline();
 }
 
 void CubicSplineModel::computeSpline()
 {
-    int n = x.size() - 1;
+    int n = m_x.size() - 1;
     if (n < 2) return;
 
-    a = y;
-    b.resize(n);
-    c.resize(n + 1);
-    d.resize(n);
+    m_a = m_y;
+    m_b.resize(n);
+    m_c.resize(n + 1);
+    m_d.resize(n);
 
     QVector<double> h(n);
     for (int i = 0; i < n; ++i)
     {
-        h[i] = x[i + 1] - x[i];
+        h[i] = m_x[i + 1] - m_x[i];
     }
 
     QVector<double> A(n), B(n), C(n), F(n);
@@ -76,7 +76,7 @@ void CubicSplineModel::computeSpline()
         A[i] = h[i - 1];
         B[i] = 2.0 * (h[i - 1] + h[i]);
         C[i] = h[i];
-        F[i] = 3.0 * ((a[i + 1] - a[i]) / h[i] - (a[i] - a[i - 1]) / h[i - 1]);
+        F[i] = 3.0 * ((m_a[i + 1] - m_a[i]) / h[i] - (m_a[i] - m_a[i - 1]) / h[i - 1]);
     }
 
     B[0] = 1; B[n - 1] = 1;
@@ -90,18 +90,18 @@ void CubicSplineModel::computeSpline()
         F[i] -= m * F[i - 1];
     }
 
-    c[n - 1] = F[n - 1] / B[n - 1];
+    m_c[n - 1] = F[n - 1] / B[n - 1];
     for (int i = n - 2; i > 0; --i)
     {
-        c[i] = (F[i] - C[i] * c[i + 1]) / B[i];
+        m_c[i] = (F[i] - C[i] * m_c[i + 1]) / B[i];
     }
-    c[0] = 0;
-    c[n] = 0;
+    m_c[0] = 0;
+    m_c[n] = 0;
 
     for (int i = 0; i < n; ++i)
     {
-        b[i] = (a[i + 1] - a[i]) / h[i] - h[i] * (c[i + 1] + 2.0 * c[i]) / 3.0;
-        d[i] = (c[i + 1] - c[i]) / (3.0 * h[i]);
+        m_b[i] = (m_a[i + 1] - m_a[i]) / h[i] - h[i] * (m_c[i + 1] + 2.0 * m_c[i]) / 3.0;
+        m_d[i] = (m_c[i + 1] - m_c[i]) / (3.0 * h[i]);
     }
 
     emit splineUpdated();
@@ -109,41 +109,41 @@ void CubicSplineModel::computeSpline()
 
 double CubicSplineModel::evaluate(double xVal) const
 {
-    if (x.isEmpty() || y.isEmpty()) return 0.0;
+    if (m_x.isEmpty() || m_y.isEmpty()) return 0.0;
 
     int i = 0;
-    while (i < x.size() - 1 && xVal > x[i + 1])
+    while (i < m_x.size() - 1 && xVal > m_x[i + 1])
     {
         ++i;
     }
 
-    double dx = xVal - x[i];
-    return a[i] + b[i] * dx + c[i] * dx * dx + d[i] * dx * dx * dx;
+    double dx = xVal - m_x[i];
+    return m_a[i] + m_b[i] * dx + m_c[i] * dx * dx + m_d[i] * dx * dx * dx;
 }
 
 QVector<double> CubicSplineModel::getCoefficientsA() const
 {
-    return a;
+    return m_a;
 }
 
 QVector<double> CubicSplineModel::getCoefficientsB() const
 {
-    return b;
+    return m_b;
 }
 
 QVector<double> CubicSplineModel::getCoefficientsC() const
 {
-    return c;
+    return m_c;
 }
 
 QVector<double> CubicSplineModel::getCoefficientsD() const
 {
-    return d;
+    return m_d;
 }
 
 QVector<double> CubicSplineModel::getX() const
 {
-    return x;
+    return m_x;
 }
 
 double CubicSplineModel::function(double x) const

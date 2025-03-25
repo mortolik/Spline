@@ -19,11 +19,11 @@ public:
     void setModel(CubicSplineModel *model);
 
 private:
-    CubicSplineModel *splineModel;
-    QChart *chart;
-    QChartView *chartView;
-    QLineSeries *functionSeries;
-    QLineSeries *splineSeries;
+    CubicSplineModel * m_splineModel;
+    QChart* m_chart;
+    QChartView* m_chartView;
+    QLineSeries* m_functionSeries;
+    QLineSeries* m_splineSeries;
 
     void updateChart();
 };

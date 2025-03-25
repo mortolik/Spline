@@ -8,15 +8,15 @@
 namespace Spline
 {
 CubicSplineWidget::CubicSplineWidget(QWidget *parent)
-    : QWidget(parent), splineModel(nullptr)
+    : QWidget(parent), m_splineModel(nullptr)
 {
-    chart = new QChart();
-    chartView = new QChartView(chart);
-    functionSeries = new QLineSeries();
-    splineSeries = new QLineSeries();
+    m_chart = new QChart();
+    m_chartView = new QChartView(m_chart);
+    m_functionSeries = new QLineSeries();
+    m_splineSeries = new QLineSeries();
 
-    chart->addSeries(functionSeries);
-    chart->addSeries(splineSeries);
+    m_chart->addSeries(m_functionSeries);
+    m_chart->addSeries(m_splineSeries);
 
     QValueAxis *axisX = new QValueAxis();
     QValueAxis *axisY = new QValueAxis();
@@ -24,66 +24,66 @@ CubicSplineWidget::CubicSplineWidget(QWidget *parent)
     axisX->setTitleText("X");
     axisY->setTitleText("Y");
 
-    chart->addAxis(axisX, Qt::AlignBottom);
-    chart->addAxis(axisY, Qt::AlignLeft);
-    functionSeries->attachAxis(axisX);
-    functionSeries->attachAxis(axisY);
-    splineSeries->attachAxis(axisX);
-    splineSeries->attachAxis(axisY);
+    m_chart->addAxis(axisX, Qt::AlignBottom);
+    m_chart->addAxis(axisY, Qt::AlignLeft);
+    m_functionSeries->attachAxis(axisX);
+    m_functionSeries->attachAxis(axisY);
+    m_splineSeries->attachAxis(axisX);
+    m_splineSeries->attachAxis(axisY);
 
-    functionSeries->setName("Оригинальная функция");
-    splineSeries->setName("Кубический сплайн");
+    m_functionSeries->setName("Оригинальная функция");
+    m_splineSeries->setName("Кубический сплайн");
 
     clearChart();
 
     QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(chartView);
+    layout->addWidget(m_chartView);
     setLayout(layout);
 }
 
 void CubicSplineWidget::clearChart()
 {
-    functionSeries->clear();
-    splineSeries->clear();
-    chart->axes(Qt::Horizontal).first()->setRange(0, 1);
-    chart->axes(Qt::Vertical).first()->setRange(0, 1);
-    chart->update();
+    m_functionSeries->clear();
+    m_splineSeries->clear();
+    m_chart->axes(Qt::Horizontal).first()->setRange(0, 1);
+    m_chart->axes(Qt::Vertical).first()->setRange(0, 1);
+    m_chart->update();
 }
 void CubicSplineWidget::setModel(CubicSplineModel *model)
 {
-    splineModel = model;
-    connect(splineModel, &CubicSplineModel::splineUpdated, this, &CubicSplineWidget::updateChart);
+    m_splineModel = model;
+    connect(m_splineModel, &CubicSplineModel::splineUpdated, this, &CubicSplineWidget::updateChart);
     updateChart();
 }
 
 void CubicSplineWidget::updateChart()
- {
-    if (!splineModel)
+{
+    if (!m_splineModel)
         return;
 
-    functionSeries->clear();
-    splineSeries->clear();
+    m_functionSeries->clear();
+    m_splineSeries->clear();
 
     int points = 100;
-    double a = splineModel->getIntervalA(); 
-    double b = splineModel->getIntervalB();
+    double a = m_splineModel->getIntervalA();
+    double b = m_splineModel->getIntervalB();
     double step = (b - a) / points;
 
     for (int i = 0; i <= points; ++i) 
-{
+    {
         double x = a + i * step;
-        functionSeries->append(x, splineModel->function(x));
-        splineSeries->append(x, splineModel->evaluate(x));
+        m_functionSeries->append(x, m_splineModel->function(x));
+        m_splineSeries->append(x, m_splineModel->evaluate(x));
     }
 
 
-    chart->createDefaultAxes();
-    chart->axes(Qt::Horizontal).first()->setRange(a, b);
-    chart->axes(Qt::Vertical).first()->setRange(
-        qMin(functionSeries->points().first().y(), splineSeries->points().first().y()),
-        qMax(functionSeries->points().last().y(), splineSeries->points().last().y())
+    m_chart->createDefaultAxes();
+    m_chart->axes(Qt::Horizontal).first()->setRange(a, b);
+    m_chart->axes(Qt::Vertical).first()->setRange(
+        qMin(m_functionSeries->points().first().y(), m_splineSeries->points().first().y()),
+        qMax(m_functionSeries->points().last().y(), m_splineSeries->points().last().y())
         );
 
-    chart->update();
+    m_chart->update();
 }
 }
