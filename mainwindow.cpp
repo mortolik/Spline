@@ -27,6 +27,7 @@ void MainWindow::setupUI()
     splineModel = new Spline::CubicSplineModel(this);
     splineWidget = new Spline::CubicSplineWidget(this);
     splineWidget->setModel(splineModel);
+    splineWidget->clearChart();
 
     nSpinBox = new QSpinBox(this);
     nSpinBox->setRange(2, 100);

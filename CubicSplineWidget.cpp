@@ -34,11 +34,21 @@ CubicSplineWidget::CubicSplineWidget(QWidget *parent)
     functionSeries->setName("Оригинальная функция");
     splineSeries->setName("Кубический сплайн");
 
+    clearChart();
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(chartView);
     setLayout(layout);
 }
 
+void CubicSplineWidget::clearChart()
+{
+    functionSeries->clear();
+    splineSeries->clear();
+    chart->axes(Qt::Horizontal).first()->setRange(0, 1);
+    chart->axes(Qt::Vertical).first()->setRange(0, 1);
+    chart->update();
+}
 void CubicSplineWidget::setModel(CubicSplineModel *model)
 {
     splineModel = model;

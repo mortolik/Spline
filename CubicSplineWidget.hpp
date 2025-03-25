@@ -15,6 +15,7 @@ class CubicSplineWidget : public QWidget
 
 public:
     explicit CubicSplineWidget(QWidget *parent = nullptr);
+    void clearChart();
     void setModel(CubicSplineModel *model);
 
 private:
