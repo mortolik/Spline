@@ -26,8 +26,12 @@ public:
     ~MainWindow();
 
 private:
-    Spline::CubicSplineModel* m_splineModel;
-    Spline::CubicSplineWidget* m_splineWidget;
+    Spline::CubicSplineModel* m_splineModelMain;
+    Spline::CubicSplineWidget* m_splineWidgetMain;
+
+    Spline::CubicSplineModel* m_splineModelTest;
+    Spline::CubicSplineWidget* m_splineWidgetTest;
+
     QSpinBox* m_nSpinBox;
     QPushButton* m_updateButton;
     QTableWidget* m_coeffTable;
@@ -35,7 +39,7 @@ private:
 
     void setupUI();
     void updateSpline();
-    void updateTable();
+    void updateTable(Spline::CubicSplineModel* splineModel);
     void toggleTestMode();
     QWidget* setupTestFunctionTab();
     QWidget* setupMainFunctionTab();
