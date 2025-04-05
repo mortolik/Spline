@@ -3,7 +3,11 @@
 
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
-#include <QtCharts/QValueAxis>
+
+QT_FORWARD_DECLARE_CLASS(QSpinBox);
+QT_FORWARD_DECLARE_CLASS(QPushButton);
+QT_FORWARD_DECLARE_CLASS(QTableWidget);
+
 QT_CHARTS_USE_NAMESPACE
 
 namespace Spline
@@ -18,12 +22,22 @@ public:
     void clearChart();
     void setModel(CubicSplineModel *model);
 
+public slots:
+    void updateSpline();
+    void updateTable();
+
 private:
     CubicSplineModel * m_splineModel;
     QChart* m_chart;
     QChartView* m_chartView;
     QLineSeries* m_functionSeries;
-    QLineSeries* m_splineSeries;
+    QLineSeries* m_splineSeries;    
+    QSpinBox* m_nSpinBox;
+    QPushButton* m_updateButton;
+
+    QTableWidget* m_coeffTable;
+
+    void createChart();
 
     void updateChart();
 };

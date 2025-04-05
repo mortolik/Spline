@@ -7,9 +7,7 @@ namespace Spline
 class CubicSplineModel;
 class CubicSplineWidget;
 }
-QT_FORWARD_DECLARE_CLASS(QSpinBox);
-QT_FORWARD_DECLARE_CLASS(QPushButton);
-QT_FORWARD_DECLARE_CLASS(QTableWidget);
+
 QT_FORWARD_DECLARE_CLASS(QTabWidget);
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -26,8 +24,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void updateMainSpline();
-    void updateTestSpline();
 
 private:
     Spline::CubicSplineModel* m_splineModelMain;
@@ -36,14 +32,12 @@ private:
     Spline::CubicSplineModel* m_splineModelTest;
     Spline::CubicSplineWidget* m_splineWidgetTest;
 
-    QSpinBox* m_nSpinBox;
-    QPushButton* m_updateButton;
-    QTableWidget* m_coeffTable;
     QTabWidget *m_tabWidget;
 
     void setupUI();
-    void updateTable(Spline::CubicSplineModel* splineModel);
-    QWidget* setupTestFunctionTab();
-    QWidget* setupMainFunctionTab();
+
+    QWidget *setupFunctionTab(Spline::CubicSplineModel* splineModel,
+                              Spline::CubicSplineWidget* splineWidget,
+                              QString text);
 };
 #endif // MAINWINDOW_H
