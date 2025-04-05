@@ -6,23 +6,36 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QTableWidget>
+#include <QTabWidget>
+#include <QLabel>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-
     setupUI();
-    setMinimumSize(800, 800);
+    setMinimumSize(1000, 800);
 }
 
 MainWindow::~MainWindow()
 {
-
 }
 
 void MainWindow::setupUI()
 {
-    QWidget *centralWidget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(centralWidget);
+    m_tabWidget = new QTabWidget(this);
+
+    QWidget* testFunctionTab = setupTestFunctionTab();
+    m_tabWidget->addTab(testFunctionTab, "Тестовая функция");
+
+    QWidget* mainFunctionTab = setupMainFunctionTab();
+    m_tabWidget->addTab(mainFunctionTab, "Основная функция");
+
+    setCentralWidget(m_tabWidget);
+}
+
+QWidget* MainWindow::setupTestFunctionTab()
+{
+    QWidget *tab = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(tab);
 
     m_splineModel = new Spline::CubicSplineModel(this);
     m_splineWidget = new Spline::CubicSplineWidget(this);
@@ -34,22 +47,49 @@ void MainWindow::setupUI()
     m_nSpinBox->setValue(4);
 
     m_updateButton = new QPushButton("Построить сплайн", this);
-    m_testButton = new QPushButton("Переключить функцию", this);
 
     m_coeffTable = new QTableWidget(this);
     m_coeffTable->setColumnCount(7);
     m_coeffTable->setHorizontalHeaderLabels({"i", "xi-1", "xi", "ai", "bi", "ci", "di"});
 
+    layout->addWidget(new QLabel("Тестовая функция: φ(x)"));
     layout->addWidget(m_nSpinBox);
     layout->addWidget(m_updateButton);
-    layout->addWidget(m_testButton);
+    layout->addWidget(m_splineWidget);
+    layout->addWidget(m_coeffTable);
+
+    connect(m_updateButton, &QPushButton::clicked, this, &MainWindow::toggleTestMode);
+    return tab;
+}
+
+QWidget* MainWindow::setupMainFunctionTab()
+{
+    QWidget *tab = new QWidget(this);
+    QVBoxLayout *layout = new QVBoxLayout(tab);
+
+    m_splineModel = new Spline::CubicSplineModel(this);
+    m_splineWidget = new Spline::CubicSplineWidget(this);
+    m_splineWidget->setModel(m_splineModel);
+    m_splineWidget->clearChart();
+
+    m_nSpinBox = new QSpinBox(this);
+    m_nSpinBox->setRange(2, 100);
+    m_nSpinBox->setValue(4);
+
+    m_updateButton = new QPushButton("Построить сплайн", this);
+
+    m_coeffTable = new QTableWidget(this);
+    m_coeffTable->setColumnCount(7);
+    m_coeffTable->setHorizontalHeaderLabels({"i", "xi-1", "xi", "ai", "bi", "ci", "di"});
+
+    layout->addWidget(new QLabel("Основная функция: ln(x+1)/(x+1)"));
+    layout->addWidget(m_nSpinBox);
+    layout->addWidget(m_updateButton);
     layout->addWidget(m_splineWidget);
     layout->addWidget(m_coeffTable);
 
     connect(m_updateButton, &QPushButton::clicked, this, &MainWindow::updateSpline);
-    connect(m_testButton, &QPushButton::clicked, this, &MainWindow::toggleTestMode);
-
-    setCentralWidget(centralWidget);
+    return tab;
 }
 
 void MainWindow::updateSpline()
@@ -66,15 +106,6 @@ void MainWindow::toggleTestMode()
     m_splineModel->setTestMode(testMode);
     m_splineModel->setPoints(m_nSpinBox->value());
     updateTable();
-
-    if (testMode)
-    {
-        m_testButton->setText("Основная функция");
-    }
-    else
-    {
-        m_testButton->setText("Тестовая функция");
-    }
 }
 
 void MainWindow::updateTable()
@@ -85,7 +116,6 @@ void MainWindow::updateTable()
     QVector<double> b = m_splineModel->getCoefficientsB();
     QVector<double> c = m_splineModel->getCoefficientsC();
     QVector<double> d = m_splineModel->getCoefficientsD();
-
 
     int n = a.size() - 1;
     m_coeffTable->setRowCount(n);
