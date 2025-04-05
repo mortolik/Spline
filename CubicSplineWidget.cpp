@@ -15,6 +15,13 @@ CubicSplineWidget::CubicSplineWidget(QWidget *parent)
     m_functionSeries = new QLineSeries();
     m_splineSeries = new QLineSeries();
 
+    m_chart->setMinimumSize(800, 600);
+    m_chart->setMaximumSize(1200, 900);
+    m_chart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    m_chartView->setMinimumSize(400, 300);
+    m_chartView->setRenderHint(QPainter::Antialiasing);
+
     m_chart->addSeries(m_functionSeries);
     m_chart->addSeries(m_splineSeries);
 
@@ -59,8 +66,9 @@ void CubicSplineWidget::setModel(CubicSplineModel *model)
 void CubicSplineWidget::updateChart()
 {
     if (!m_splineModel)
+    {
         return;
-
+    }
     m_functionSeries->clear();
     m_splineSeries->clear();
 
@@ -69,20 +77,31 @@ void CubicSplineWidget::updateChart()
     double b = m_splineModel->getIntervalB();
     double step = (b - a) / points;
 
-    for (int i = 0; i <= points; ++i) 
+    double minY = std::numeric_limits<double>::max();
+    double maxY = std::numeric_limits<double>::lowest();
+
+    for (int i = 0; i <= points; ++i)
     {
         double x = a + i * step;
-        m_functionSeries->append(x, m_splineModel->function(x));
-        m_splineSeries->append(x, m_splineModel->evaluate(x));
+        double funcY = m_splineModel->function(x);
+        double splineY = m_splineModel->evaluate(x);
+
+        m_functionSeries->append(x, funcY);
+        m_splineSeries->append(x, splineY);
+
+        minY = qMin(minY, qMin(funcY, splineY));
+        maxY = qMax(maxY, qMax(funcY, splineY));
     }
 
+    if (qFuzzyCompare(minY, maxY))
+    {
+        minY -= 1.0;
+        maxY += 1.0;
+    }
 
     m_chart->createDefaultAxes();
     m_chart->axes(Qt::Horizontal).first()->setRange(a, b);
-    m_chart->axes(Qt::Vertical).first()->setRange(
-        qMin(m_functionSeries->points().first().y(), m_splineSeries->points().first().y()),
-        qMax(m_functionSeries->points().last().y(), m_splineSeries->points().last().y())
-        );
+    m_chart->axes(Qt::Vertical).first()->setRange(minY, maxY);
 
     m_chart->update();
 }
