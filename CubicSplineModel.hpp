@@ -23,10 +23,14 @@ public:
     QVector<double> getX() const;
 
     double function(double x) const;
+    double functionDerivative(double x) const;
+    double functionSecondDerivative(double x) const;
 
     void setInterval(double a, double b);
     double getIntervalA() const;
     double getIntervalB() const;
+
+    void setTestMode(bool testMode);
 
 signals:
     void splineUpdated();
@@ -37,6 +41,8 @@ private:
 
     double m_intervalA = 0.2;
     double m_intervalB = 2.0;
+
+    bool m_testMode = false;
 
 };
 }

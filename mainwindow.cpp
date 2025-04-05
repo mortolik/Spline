@@ -31,9 +31,10 @@ void MainWindow::setupUI()
 
     m_nSpinBox = new QSpinBox(this);
     m_nSpinBox->setRange(2, 100);
-    m_nSpinBox->setValue(10);
+    m_nSpinBox->setValue(4);
 
     m_updateButton = new QPushButton("Построить сплайн", this);
+    m_testButton = new QPushButton("Переключить функцию", this);
 
     m_coeffTable = new QTableWidget(this);
     m_coeffTable->setColumnCount(7);
@@ -41,10 +42,12 @@ void MainWindow::setupUI()
 
     layout->addWidget(m_nSpinBox);
     layout->addWidget(m_updateButton);
+    layout->addWidget(m_testButton);
     layout->addWidget(m_splineWidget);
     layout->addWidget(m_coeffTable);
 
     connect(m_updateButton, &QPushButton::clicked, this, &MainWindow::updateSpline);
+    connect(m_testButton, &QPushButton::clicked, this, &MainWindow::toggleTestMode);
 
     setCentralWidget(centralWidget);
 }
@@ -54,6 +57,24 @@ void MainWindow::updateSpline()
     int n = m_nSpinBox->value();
     m_splineModel->setPoints(n);
     updateTable();
+}
+
+void MainWindow::toggleTestMode()
+{
+    static bool testMode = false;
+    testMode = !testMode;
+    m_splineModel->setTestMode(testMode);
+    m_splineModel->setPoints(m_nSpinBox->value());
+    updateTable();
+
+    if (testMode)
+    {
+        m_testButton->setText("Основная функция");
+    }
+    else
+    {
+        m_testButton->setText("Тестовая функция");
+    }
 }
 
 void MainWindow::updateTable()

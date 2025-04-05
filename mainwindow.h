@@ -31,9 +31,11 @@ private:
     QSpinBox* m_nSpinBox;
     QPushButton* m_updateButton;
     QTableWidget* m_coeffTable;
+    QPushButton *m_testButton;
 
     void setupUI();
     void updateSpline();
     void updateTable();
+    void toggleTestMode();
 };
 #endif // MAINWINDOW_H

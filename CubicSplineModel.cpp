@@ -67,41 +67,39 @@ void CubicSplineModel::computeSpline()
     QVector<double> h(n);
     for (int i = 0; i < n; ++i)
     {
-        h[i] = m_x[i + 1] - m_x[i];
+        h[i] = m_x[i+1] - m_x[i];
     }
 
-    QVector<double> A(n), B(n), C(n), F(n);
+    if (m_testMode)
+    {
+        m_c[0] = 0;
+        m_c[n] = 0;
+    }
+
+    QVector<double> alpha(n), beta(n);
+    alpha[0] = 0;
+    beta[0] = 0;
+
     for (int i = 1; i < n; ++i)
     {
-        A[i] = h[i - 1];
-        B[i] = 2.0 * (h[i - 1] + h[i]);
-        C[i] = h[i];
-        F[i] = 3.0 * ((m_a[i + 1] - m_a[i]) / h[i] - (m_a[i] - m_a[i - 1]) / h[i - 1]);
+        double A = h[i-1];
+        double B = 2*(h[i-1] + h[i]);
+        double C = h[i];
+        double F = 3*((m_a[i+1] - m_a[i])/h[i] - (m_a[i] - m_a[i-1])/h[i-1]);
+
+        alpha[i] = -C / (A*alpha[i-1] + B);
+        beta[i] = (F - A*beta[i-1]) / (A*alpha[i-1] + B);
     }
 
-    B[0] = 1; B[n - 1] = 1;
-    C[0] = 0; A[n - 1] = 0;
-    F[0] = 0; F[n - 1] = 0;
-
-    for (int i = 1; i < n - 1; ++i)
+    for (int i = n-1; i > 0; --i)
     {
-        double m = A[i] / B[i - 1];
-        B[i] -= m * C[i - 1];
-        F[i] -= m * F[i - 1];
+        m_c[i] = alpha[i]*m_c[i+1] + beta[i];
     }
-
-    m_c[n - 1] = F[n - 1] / B[n - 1];
-    for (int i = n - 2; i > 0; --i)
-    {
-        m_c[i] = (F[i] - C[i] * m_c[i + 1]) / B[i];
-    }
-    m_c[0] = 0;
-    m_c[n] = 0;
 
     for (int i = 0; i < n; ++i)
     {
-        m_b[i] = (m_a[i + 1] - m_a[i]) / h[i] - h[i] * (m_c[i + 1] + 2.0 * m_c[i]) / 3.0;
-        m_d[i] = (m_c[i + 1] - m_c[i]) / (3.0 * h[i]);
+        m_b[i] = (m_a[i+1] - m_a[i])/h[i] - h[i]*(m_c[i+1] + 2*m_c[i])/3.0;
+        m_d[i] = (m_c[i+1] - m_c[i])/(3.0*h[i]);
     }
 
     emit splineUpdated();
@@ -148,6 +146,63 @@ QVector<double> CubicSplineModel::getX() const
 
 double CubicSplineModel::function(double x) const
 {
-    return qLn(x + 1) / (x + 1);
+    if (m_testMode)
+    {
+        if (x >= -1 && x <= 0)
+            return x*x*x + 3*x*x;
+        else if (x > 0 && x <= 1)
+            return -x*x*x + 3*x*x;
+        else
+            return 0;
+    }
+    else
+    {
+        return qLn(x + 1) / (x + 1);
+    }
 }
+double CubicSplineModel::functionDerivative(double x) const
+{
+    if (m_testMode)
+    {
+        if (x >= -1 && x <= 0)
+            return 3*x*x + 6*x;
+        else if (x > 0 && x <= 1)
+            return -3*x*x + 6*x;
+        else
+            return 0;
+    }
+    else
+    {
+        return (1 - qLn(x + 1)) / ((x + 1)*(x + 1));
+    }
+}
+
+double CubicSplineModel::functionSecondDerivative(double x) const
+{
+    if (m_testMode)
+    {
+        if (x >= -1 && x <= 0)
+            return 6*x + 6;
+        else if (x > 0 && x <= 1)
+            return -6*x + 6;
+        else
+            return 0;
+    }
+    else
+    {
+        return (2*qLn(x + 1) - 3) / ((x + 1)*(x + 1)*(x + 1));
+    }
+}
+void CubicSplineModel::setTestMode(bool testMode)
+{
+    m_testMode = testMode;
+    if (m_testMode)
+    {
+        setInterval(-1, 1);
+    } else
+    {
+        setInterval(0.2, 2.0);
+    }
+}
+
 }
