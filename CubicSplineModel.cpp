@@ -182,11 +182,17 @@ double CubicSplineModel::functionSecondDerivative(double x) const
     if (m_testMode)
     {
         if (x >= -1 && x <= 0)
+        {
             return 6*x + 6;
+        }
         else if (x > 0 && x <= 1)
+        {
             return -6*x + 6;
+        }
         else
+        {
             return 0;
+        }
     }
     else
     {
@@ -199,7 +205,8 @@ void CubicSplineModel::setTestMode(bool testMode)
     if (m_testMode)
     {
         setInterval(-1, 1);
-    } else
+    }
+    else
     {
         setInterval(0.2, 2.0);
     }
