@@ -58,7 +58,7 @@ QWidget* MainWindow::setupTestFunctionTab()
     layout->addWidget(m_splineWidgetTest);
     layout->addWidget(m_coeffTable);
 
-    connect(m_updateButton, &QPushButton::clicked, this, &MainWindow::toggleTestMode);
+    connect(m_updateButton, &QPushButton::clicked, this, &MainWindow::updateTestSpline);
     return tab;
 }
 
@@ -88,18 +88,18 @@ QWidget* MainWindow::setupMainFunctionTab()
     layout->addWidget(m_splineWidgetMain);
     layout->addWidget(m_coeffTable);
 
-    connect(m_updateButton, &QPushButton::clicked, this, &MainWindow::updateSpline);
+    connect(m_updateButton, &QPushButton::clicked, this, &MainWindow::updateMainSpline);
     return tab;
 }
 
-void MainWindow::updateSpline()
+void MainWindow::updateMainSpline()
 {
     int n = m_nSpinBox->value();
     m_splineModelMain->setPoints(n);
     updateTable(m_splineModelMain);
 }
 
-void MainWindow::toggleTestMode()
+void MainWindow::updateTestSpline()
 {
     static bool testMode = false;
     testMode = !testMode;

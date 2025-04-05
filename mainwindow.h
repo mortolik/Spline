@@ -25,6 +25,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void updateMainSpline();
+    void updateTestSpline();
+
 private:
     Spline::CubicSplineModel* m_splineModelMain;
     Spline::CubicSplineWidget* m_splineWidgetMain;
@@ -38,9 +42,7 @@ private:
     QTabWidget *m_tabWidget;
 
     void setupUI();
-    void updateSpline();
     void updateTable(Spline::CubicSplineModel* splineModel);
-    void toggleTestMode();
     QWidget* setupTestFunctionTab();
     QWidget* setupMainFunctionTab();
 };
