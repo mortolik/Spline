@@ -15,13 +15,16 @@ CubicSplineWidget::CubicSplineWidget(QWidget *parent)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
 
+    QHBoxLayout* inputLayout = new QHBoxLayout();
     m_nSpinBox = new QSpinBox(this);
+    m_nSpinBox->setMaximumWidth(150);
     m_nSpinBox->setRange(2, 100);
     m_nSpinBox->setValue(4);
-    layout->addWidget(m_nSpinBox);
+    inputLayout->addWidget(m_nSpinBox);
 
     m_updateButton = new QPushButton("Построить сплайн", this);
-    layout->addWidget(m_updateButton);
+    inputLayout->addWidget(m_updateButton);
+    layout->addLayout(inputLayout);
 
     createChart();
     layout->addWidget(m_chartView);
