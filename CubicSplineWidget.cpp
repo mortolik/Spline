@@ -1,4 +1,5 @@
 #include <QSpinBox>
+#include <QHeaderView>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QTableWidget>
@@ -13,30 +14,45 @@ namespace Spline
 CubicSplineWidget::CubicSplineWidget(QWidget *parent)
     : QWidget(parent), m_splineModel(nullptr)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
-    QHBoxLayout* inputLayout = new QHBoxLayout();
+    QHBoxLayout* controlLayout = new QHBoxLayout();
     m_nSpinBox = new QSpinBox(this);
     m_nSpinBox->setMaximumWidth(150);
     m_nSpinBox->setRange(2, 10000);
     m_nSpinBox->setValue(4);
-    inputLayout->addWidget(m_nSpinBox);
 
     m_updateButton = new QPushButton("Построить сплайн", this);
-    inputLayout->addWidget(m_updateButton);
-    layout->addLayout(inputLayout);
+    controlLayout->addWidget(m_nSpinBox);
+    controlLayout->addWidget(m_updateButton);
+    mainLayout->addLayout(controlLayout);
 
     createChart();
-    layout->addWidget(m_chartView);
+    mainLayout->addWidget(m_chartView);
 
+    m_tablesTabWidget = new QTabWidget(this);
     m_coeffTable = new QTableWidget(this);
-    m_coeffTable->setColumnCount(7);
-    m_coeffTable->setHorizontalHeaderLabels({"i", "xi-1", "xi", "ai", "bi", "ci", "di"});
-    layout->addWidget(m_coeffTable);
+    m_errorTable = new QTableWidget(this);
+    setupTables();
 
-    setLayout(layout);
+    m_tablesTabWidget->addTab(m_coeffTable, "Коэффициенты");
+    m_tablesTabWidget->addTab(m_errorTable, "Погрешности");
+    mainLayout->addWidget(m_tablesTabWidget);
+
+    setLayout(mainLayout);
 
     connect(m_updateButton, &QPushButton::clicked, this, &CubicSplineWidget::updateSpline);
+}
+
+void CubicSplineWidget::setupTables()
+{
+    m_coeffTable->setColumnCount(7);
+    m_coeffTable->setHorizontalHeaderLabels({"i", "xi-1", "xi", "ai", "bi", "ci", "di"});
+    m_coeffTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    m_errorTable->setColumnCount(4);
+    m_errorTable->setHorizontalHeaderLabels({"x", "F(x)", "S(x)", "F(x)-S(x)"});
+    m_errorTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
 void CubicSplineWidget::clearChart()
@@ -47,10 +63,16 @@ void CubicSplineWidget::clearChart()
     m_chart->axes(Qt::Vertical).first()->setRange(0, 1);
     m_chart->update();
 }
+
 void CubicSplineWidget::setModel(CubicSplineModel *model)
 {
     m_splineModel = model;
-    connect(m_splineModel, &CubicSplineModel::splineUpdated, this, &CubicSplineWidget::updateChart);
+    connect(m_splineModel, &CubicSplineModel::splineUpdated, this, [this]()
+            {
+                updateChart();
+                updateCoeffTable();
+                updateErrorTable();
+            });
     updateChart();
 }
 
@@ -62,7 +84,6 @@ void CubicSplineWidget::setSpinBoxValue(int val)
 void CubicSplineWidget::updateSpline()
 {
     m_splineModel->setPoints(m_nSpinBox->value());
-    updateTable();
 }
 
 void CubicSplineWidget::updateChart()
@@ -107,10 +128,15 @@ void CubicSplineWidget::updateChart()
 
     m_chart->update();
 }
-void CubicSplineWidget::updateTable()
-{
-    QVector<double> xValues = m_splineModel->getX();
 
+void CubicSplineWidget::updateCoeffTable()
+{
+    if (!m_splineModel)
+    {
+        return;
+    }
+
+    QVector<double> xValues = m_splineModel->getX();
     QVector<double> a = m_splineModel->getCoefficientsA();
     QVector<double> b = m_splineModel->getCoefficientsB();
     QVector<double> c = m_splineModel->getCoefficientsC();
@@ -128,6 +154,30 @@ void CubicSplineWidget::updateTable()
         m_coeffTable->setItem(i, 4, new QTableWidgetItem(QString::number(b[i])));
         m_coeffTable->setItem(i, 5, new QTableWidgetItem(QString::number(c[i])));
         m_coeffTable->setItem(i, 6, new QTableWidgetItem(QString::number(d[i])));
+    }
+}
+
+void CubicSplineWidget::updateErrorTable()
+{
+    if (!m_splineModel) return;
+
+    int N = 20;
+    double a = m_splineModel->getIntervalA();
+    double b = m_splineModel->getIntervalB();
+    double step = (b - a) / N;
+
+    m_errorTable->setRowCount(N + 1);
+
+    for (int j = 0; j <= N; ++j)
+    {
+        double x = a + j * step;
+        double F = m_splineModel->function(x);
+        double S = m_splineModel->evaluate(x);
+
+        m_errorTable->setItem(j, 0, new QTableWidgetItem(QString::number(x)));
+        m_errorTable->setItem(j, 1, new QTableWidgetItem(QString::number(F)));
+        m_errorTable->setItem(j, 2, new QTableWidgetItem(QString::number(S)));
+        m_errorTable->setItem(j, 3, new QTableWidgetItem(QString::number(F - S)));
     }
 }
 
