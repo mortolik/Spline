@@ -21,6 +21,7 @@ public:
     explicit CubicSplineWidget(QWidget *parent = nullptr);
     void clearChart();
     void setModel(CubicSplineModel *model);
+    void setSpinBoxValue(int val);
 
 public slots:
     void updateSpline();

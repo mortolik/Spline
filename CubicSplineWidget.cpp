@@ -18,7 +18,7 @@ CubicSplineWidget::CubicSplineWidget(QWidget *parent)
     QHBoxLayout* inputLayout = new QHBoxLayout();
     m_nSpinBox = new QSpinBox(this);
     m_nSpinBox->setMaximumWidth(150);
-    m_nSpinBox->setRange(2, 100);
+    m_nSpinBox->setRange(2, 10000);
     m_nSpinBox->setValue(4);
     inputLayout->addWidget(m_nSpinBox);
 
@@ -52,6 +52,11 @@ void CubicSplineWidget::setModel(CubicSplineModel *model)
     m_splineModel = model;
     connect(m_splineModel, &CubicSplineModel::splineUpdated, this, &CubicSplineWidget::updateChart);
     updateChart();
+}
+
+void CubicSplineWidget::setSpinBoxValue(int val)
+{
+    m_nSpinBox->setValue(val);
 }
 
 void CubicSplineWidget::updateSpline()
