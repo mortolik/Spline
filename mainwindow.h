@@ -40,7 +40,6 @@ private:
     void setupUI();
 
     QWidget *setupFunctionTab(Spline::CubicSplineModel* splineModel,
-                              Spline::CubicSplineWidget* splineWidget,
                               QString text);
 };
 #endif // MAINWINDOW_H
