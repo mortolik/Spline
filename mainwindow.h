@@ -32,6 +32,9 @@ private:
     Spline::CubicSplineModel* m_splineModelTest;
     Spline::CubicSplineWidget* m_splineWidgetTest;
 
+    Spline::CubicSplineModel* m_splineModelOscillating;
+    Spline::CubicSplineWidget* m_splineWidgetOscillating;
+
     QTabWidget *m_tabWidget;
 
     void setupUI();

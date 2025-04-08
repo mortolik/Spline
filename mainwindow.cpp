@@ -35,6 +35,13 @@ void MainWindow::setupUI()
                                                 "Основная функция: ln(x+1)/(x+1)");
     m_tabWidget->addTab(mainFunctionTab, "Основная функция");
 
+    m_splineModelOscillating = new Spline::CubicSplineModel(this);
+    m_splineModelOscillating->setOscillatingMode(true);
+    QWidget* oscillatingFunctionTab = setupFunctionTab(m_splineModelOscillating,
+                                                       m_splineWidgetOscillating,
+                                                       "Осциллирующая функция: ln(x+1)/(x+1) + cos(10x)");
+    m_tabWidget->addTab(oscillatingFunctionTab, "Осциллирующая функция");
+
     setCentralWidget(m_tabWidget);
 }
 
