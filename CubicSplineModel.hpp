@@ -32,6 +32,9 @@ public:
 
     void setTestMode(bool testMode);
 
+    void setOscillatingMode(bool oscillatingMode);
+    bool isOscillatingMode() const;
+
 signals:
     void splineUpdated();
 
@@ -43,6 +46,7 @@ private:
     double m_intervalB = 2.0;
 
     bool m_testMode = false;
+    bool m_oscillatingMode = false;
 
 };
 }

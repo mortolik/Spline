@@ -155,11 +155,16 @@ double CubicSplineModel::function(double x) const
         else
             return 0;
     }
+    else if (m_oscillatingMode)
+    {
+        return qLn(x + 1) / (x + 1) + qCos(10 * x);
+    }
     else
     {
         return qLn(x + 1) / (x + 1);
     }
 }
+
 double CubicSplineModel::functionDerivative(double x) const
 {
     if (m_testMode)
@@ -170,6 +175,10 @@ double CubicSplineModel::functionDerivative(double x) const
             return -3*x*x + 6*x;
         else
             return 0;
+    }
+    else if (m_oscillatingMode)
+    {
+        return (1 - qLn(x + 1)) / ((x + 1) * (x + 1)) - 10 * qSin(10 * x);
     }
     else
     {
@@ -194,6 +203,10 @@ double CubicSplineModel::functionSecondDerivative(double x) const
             return 0;
         }
     }
+    else if (m_oscillatingMode)
+    {
+        return (2 * qLn(x + 1) - 3) / qPow(x + 1, 3) - 100 * qCos(10 * x);
+    }
     else
     {
         return (2*qLn(x + 1) - 3) / ((x + 1)*(x + 1)*(x + 1));
@@ -211,5 +224,16 @@ void CubicSplineModel::setTestMode(bool testMode)
         setInterval(0.2, 2.0);
     }
 }
+void CubicSplineModel::setOscillatingMode(bool oscillatingMode)
+{
+    m_oscillatingMode = oscillatingMode;
+    emit splineUpdated();
+}
+
+bool CubicSplineModel::isOscillatingMode() const
+{
+    return m_oscillatingMode;
+}
+
 
 }
