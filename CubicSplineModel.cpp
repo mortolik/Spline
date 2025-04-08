@@ -212,6 +212,41 @@ double CubicSplineModel::functionSecondDerivative(double x) const
         return (2*qLn(x + 1) - 3) / ((x + 1)*(x + 1)*(x + 1));
     }
 }
+
+double CubicSplineModel::evaluateDerivative(double xVal) const
+{
+    if (m_x.isEmpty() || m_y.isEmpty())
+    {
+        return 0.0;
+    }
+
+    int i = 0;
+    while (i < m_x.size() - 1 && xVal > m_x[i + 1])
+    {
+        ++i;
+    }
+
+    double dx = xVal - m_x[i];
+    return m_b[i] + m_c[i] * dx + m_d[i] * dx * dx;
+}
+
+double CubicSplineModel::evaluateSecondDerivative(double xVal) const
+{
+    if (m_x.isEmpty() || m_y.isEmpty())
+    {
+        return 0.0;
+    }
+
+    int i = 0;
+    while (i < m_x.size() - 1 && xVal > m_x[i + 1])
+    {
+        ++i;
+    }
+
+    double dx = xVal - m_x[i];
+    return m_c[i] + 2.0 * m_d[i] * dx;
+}
+
 void CubicSplineModel::setTestMode(bool testMode)
 {
     m_testMode = testMode;
@@ -235,5 +270,61 @@ bool CubicSplineModel::isOscillatingMode() const
     return m_oscillatingMode;
 }
 
+QVector<CubicSplineModel::ErrorData> CubicSplineModel::getErrorTableData(int N) const
+{
+    QVector<ErrorData> data;
+    if (m_x.isEmpty())
+    {
+        return data;
+    }
+    double a = m_intervalA;
+    double b = m_intervalB;
+    double step = (b - a) / N;
 
+    for (int j = 0; j <= N; ++j)
+    {
+        double x = a + j * step;
+        ErrorData entry;
+        entry.x = x;
+        entry.F = function(x);
+        entry.S = evaluate(x);
+        entry.error = entry.F - entry.S;
+        entry.F_deriv = functionDerivative(x);
+        entry.S_deriv = evaluateDerivative(x);
+        entry.deriv_error = entry.F_deriv - entry.S_deriv;
+        entry.F_second_deriv = functionSecondDerivative(x);
+        entry.S_second_deriv = evaluateSecondDerivative(x);
+        entry.second_deriv_error = entry.F_second_deriv - entry.S_second_deriv;
+
+        data.append(entry);
+    }
+    return data;
+}
+
+double CubicSplineModel::getMaxError(int N) const {
+    double maxError = 0.0;
+    auto data = getErrorTableData(N);
+    for (const auto& entry : data) {
+        maxError = qMax(maxError, qAbs(entry.error));
+    }
+    return maxError;
+}
+
+double CubicSplineModel::getMaxDerivativeError(int N) const {
+    double maxError = 0.0;
+    auto data = getErrorTableData(N);
+    for (const auto& entry : data) {
+        maxError = qMax(maxError, qAbs(entry.deriv_error));
+    }
+    return maxError;
+}
+
+double CubicSplineModel::getMaxSecondDerivativeError(int N) const {
+    double maxError = 0.0;
+    auto data = getErrorTableData(N);
+    for (const auto& entry : data) {
+        maxError = qMax(maxError, qAbs(entry.second_deriv_error));
+    }
+    return maxError;
+}
 }

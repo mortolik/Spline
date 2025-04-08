@@ -26,6 +26,9 @@ public:
     double functionDerivative(double x) const;
     double functionSecondDerivative(double x) const;
 
+    double evaluateDerivative(double xVal) const;
+    double evaluateSecondDerivative(double xVal) const;
+
     void setInterval(double a, double b);
     double getIntervalA() const;
     double getIntervalB() const;
@@ -34,6 +37,22 @@ public:
 
     void setOscillatingMode(bool oscillatingMode);
     bool isOscillatingMode() const;
+
+    struct ErrorData
+    {
+        double x;
+        double F;
+        double S;
+        double error;
+        double F_deriv;
+        double S_deriv;
+        double deriv_error;
+        double F_second_deriv;
+        double S_second_deriv;
+        double second_deriv_error;
+    };
+
+    QVector<ErrorData> getErrorTableData(int N = 100) const;
 
 signals:
     void splineUpdated();
@@ -47,6 +66,10 @@ private:
 
     bool m_testMode = false;
     bool m_oscillatingMode = false;
+
+    double getMaxError(int N = 1000) const;
+    double getMaxDerivativeError(int N = 1000) const;
+    double getMaxSecondDerivativeError(int N = 1000) const;
 
 };
 }
