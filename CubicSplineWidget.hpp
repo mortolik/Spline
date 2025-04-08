@@ -17,34 +17,50 @@ class CubicSplineModel;
 class CubicSplineWidget : public QWidget
 {
     Q_OBJECT
-
 public:
     explicit CubicSplineWidget(QWidget *parent = nullptr);
-    void clearChart();
     void setModel(CubicSplineModel *model);
     void setSpinBoxValue(int val);
+    void clearCharts();
 
-public slots:
+private slots:
     void updateSpline();
-    void updateCoeffTable();
-    void updateErrorTable();
-    void updateChart();
 
 private:
-    CubicSplineModel* m_splineModel;
-    QChart* m_chart;
-    QChartView* m_chartView;
-    QLineSeries* m_functionSeries;
-    QLineSeries* m_splineSeries;    
-    QSpinBox* m_nSpinBox;
-    QPushButton* m_updateButton;
+    CubicSplineModel *m_splineModel;
 
-    QTabWidget* m_tablesTabWidget;
-    QTableWidget* m_coeffTable;
-    QTableWidget* m_errorTable;
+    QSpinBox *m_nSpinBox;
+    QPushButton *m_updateButton;
+
+    QTabWidget *m_chartsTabWidget;
+    QTabWidget *m_tablesTabWidget;
+    QTableWidget *m_coeffTable;
+    QTableWidget *m_errorTable;
+    QTableWidget *m_errorDerivTable;
+    QTableWidget *m_errorSecondDerivTable;
+
+    QtCharts::QChart *m_chart;
+    QtCharts::QChart *m_chartDeriv;
+    QtCharts::QChart *m_chartSecondDeriv;
+    QtCharts::QChart *m_chartError;
+    QtCharts::QChart *m_chartErrorDeriv;
+    QtCharts::QChart *m_chartErrorSecondDeriv;
+    QtCharts::QLineSeries *m_functionSeries;
+    QtCharts::QLineSeries *m_splineSeries;
+    QtCharts::QLineSeries *m_functionDerivSeries;
+    QtCharts::QLineSeries *m_splineDerivSeries;
+    QtCharts::QLineSeries *m_functionSecondDerivSeries;
+    QtCharts::QLineSeries *m_splineSecondDerivSeries;
+    QtCharts::QLineSeries *m_errorSeries;
+    QtCharts::QLineSeries *m_errorDerivSeries;
+    QtCharts::QLineSeries *m_errorSecondDerivSeries;
 
     void setupTables();
+    void createCharts();
+    void updateCharts();
+    void updateCoeffTable();
+    void updateErrorTables();
+    void setupAxes(QChart* chart);
 
-    void createChart();
 };
 }

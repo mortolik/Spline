@@ -49,7 +49,7 @@ QWidget *MainWindow::setupFunctionTab(Spline::CubicSplineModel *splineModel,
 
     Spline::CubicSplineWidget *splineWidget = new Spline::CubicSplineWidget(this);
     splineWidget->setModel(splineModel);
-    splineWidget->clearChart();
+    splineWidget->clearCharts();
 
     layout->addWidget(new QLabel(text));
     layout->addWidget(splineWidget);
