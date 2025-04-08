@@ -200,7 +200,7 @@ void CubicSplineWidget::updateCoeffTable()
     QVector<double> c = m_splineModel->getCoefficientsC();
     QVector<double> d = m_splineModel->getCoefficientsD();
 
-    int n = a.size() - 1;
+    int n = b.size();
     m_coeffTable->setRowCount(n);
 
     for (int i = 0; i < n; ++i)

@@ -115,6 +115,9 @@ double CubicSplineModel::evaluate(double xVal) const
         ++i;
     }
 
+    if (i >= m_b.size())  // Защита от выхода за границы
+        i = m_b.size() - 1;
+
     double dx = xVal - m_x[i];
     return m_a[i] + m_b[i] * dx + m_c[i] * dx * dx + m_d[i] * dx * dx * dx;
 }
@@ -216,19 +219,19 @@ double CubicSplineModel::functionSecondDerivative(double x) const
 double CubicSplineModel::evaluateDerivative(double xVal) const
 {
     if (m_x.isEmpty() || m_y.isEmpty())
-    {
         return 0.0;
-    }
 
     int i = 0;
     while (i < m_x.size() - 1 && xVal > m_x[i + 1])
-    {
         ++i;
-    }
+
+    if (i >= m_b.size())
+        i = m_b.size() - 1;
 
     double dx = xVal - m_x[i];
     return m_b[i] + m_c[i] * dx + m_d[i] * dx * dx;
 }
+
 
 double CubicSplineModel::evaluateSecondDerivative(double xVal) const
 {
@@ -242,6 +245,9 @@ double CubicSplineModel::evaluateSecondDerivative(double xVal) const
     {
         ++i;
     }
+
+    if (i >= m_d.size())
+        i = m_d.size() - 1;
 
     double dx = xVal - m_x[i];
     return m_c[i] + 2.0 * m_d[i] * dx;
