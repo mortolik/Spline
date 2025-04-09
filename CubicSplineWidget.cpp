@@ -205,12 +205,12 @@ void CubicSplineWidget::updateCoeffTable()
 
     for (int i = 0; i < n; ++i)
     {
-        m_coeffTable->setItem(i, 0, new QTableWidgetItem(QString::number(i + 1)));
+        m_coeffTable->setItem(i, 0, new QTableWidgetItem(QString::number(i)));
         m_coeffTable->setItem(i, 1, new QTableWidgetItem(QString::number(xValues[i])));
         m_coeffTable->setItem(i, 2, new QTableWidgetItem(QString::number(xValues[i + 1])));
-        m_coeffTable->setItem(i, 3, new QTableWidgetItem(QString::number(a[i])));
+        m_coeffTable->setItem(i, 3, new QTableWidgetItem(QString::number(a[i + 1])));
         m_coeffTable->setItem(i, 4, new QTableWidgetItem(QString::number(b[i])));
-        m_coeffTable->setItem(i, 5, new QTableWidgetItem(QString::number(c[i])));
+        m_coeffTable->setItem(i, 5, new QTableWidgetItem(QString::number(c[i+1])));
         m_coeffTable->setItem(i, 6, new QTableWidgetItem(QString::number(d[i])));
     }
 }

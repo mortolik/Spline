@@ -70,16 +70,10 @@ void CubicSplineModel::computeSpline()
         h[i] = m_x[i+1] - m_x[i];
     }
 
-    if (m_testMode)
-    {
-        m_c[0] = 0;
-        m_c[n] = 0;
-    }
-
     QVector<double> alpha(n), beta(n);
+
     alpha[0] = 0;
     beta[0] = 0;
-
     for (int i = 1; i < n; ++i)
     {
         double A = h[i-1];
@@ -87,19 +81,31 @@ void CubicSplineModel::computeSpline()
         double C = h[i];
         double F = 3*((m_a[i+1] - m_a[i])/h[i] - (m_a[i] - m_a[i-1])/h[i-1]);
 
-        alpha[i] = -C / (A*alpha[i-1] + B);
-        beta[i] = (F - A*beta[i-1]) / (A*alpha[i-1] + B);
+        double denom = (A * alpha[i-1] + B);
+        alpha[i] = -C / denom;
+        beta[i] = (F - A * beta[i-1]) / denom;
     }
 
-    for (int i = n-1; i > 0; --i)
+    m_c[n] = 0;
+
+    for (int i = n-1; i >= 0; --i)
     {
-        m_c[i] = alpha[i]*m_c[i+1] + beta[i];
+        m_c[i] = alpha[i] * m_c[i+1] + beta[i];
+    }
+    for (int i = 0; i < n; ++i)
+    {
+        m_d[i] = (m_c[i+1] - m_c[i]) / (3.0 * h[i]);
     }
 
     for (int i = 0; i < n; ++i)
     {
         m_b[i] = (m_a[i+1] - m_a[i])/h[i] - h[i]*(m_c[i+1] + 2*m_c[i])/3.0;
-        m_d[i] = (m_c[i+1] - m_c[i])/(3.0*h[i]);
+    }
+
+    for (int i = 0; i < n; ++i)
+    {
+        m_c[i] *= 2.0;
+        m_d[i] *= 6.0;
     }
 
     emit splineUpdated();
@@ -115,11 +121,11 @@ double CubicSplineModel::evaluate(double xVal) const
         ++i;
     }
 
-    if (i >= m_b.size())  // Защита от выхода за границы
+    if (i >= m_b.size())
         i = m_b.size() - 1;
 
     double dx = xVal - m_x[i];
-    return m_a[i] + m_b[i] * dx + m_c[i] * dx * dx + m_d[i] * dx * dx * dx;
+    return m_a[i] + m_b[i] * dx + (m_c[i]/2.0) * dx * dx + (m_d[i]/6.0) * dx * dx * dx;
 }
 
 QVector<double> CubicSplineModel::getCoefficientsA() const
@@ -218,27 +224,24 @@ double CubicSplineModel::functionSecondDerivative(double x) const
 
 double CubicSplineModel::evaluateDerivative(double xVal) const
 {
-    if (m_x.isEmpty() || m_y.isEmpty())
-        return 0.0;
+    if (m_x.isEmpty() || m_y.isEmpty()) return 0.0;
 
     int i = 0;
     while (i < m_x.size() - 1 && xVal > m_x[i + 1])
+    {
         ++i;
+    }
 
     if (i >= m_b.size())
         i = m_b.size() - 1;
 
     double dx = xVal - m_x[i];
-    return m_b[i] + m_c[i] * dx + m_d[i] * dx * dx;
+    return m_b[i] + m_c[i] * dx + (m_d[i]/2.0) * dx * dx;
 }
-
 
 double CubicSplineModel::evaluateSecondDerivative(double xVal) const
 {
-    if (m_x.isEmpty() || m_y.isEmpty())
-    {
-        return 0.0;
-    }
+    if (m_x.isEmpty() || m_y.isEmpty()) return 0.0;
 
     int i = 0;
     while (i < m_x.size() - 1 && xVal > m_x[i + 1])
@@ -250,7 +253,7 @@ double CubicSplineModel::evaluateSecondDerivative(double xVal) const
         i = m_d.size() - 1;
 
     double dx = xVal - m_x[i];
-    return m_c[i] + 2.0 * m_d[i] * dx;
+    return m_c[i] + m_d[i] * dx;
 }
 
 void CubicSplineModel::setTestMode(bool testMode)
