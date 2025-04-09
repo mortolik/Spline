@@ -5,6 +5,7 @@
 #include <QtCharts/QLineSeries>
 
 QT_FORWARD_DECLARE_CLASS(QSpinBox);
+QT_FORWARD_DECLARE_CLASS(QTextEdit);
 QT_FORWARD_DECLARE_CLASS(QTabWidget);
 QT_FORWARD_DECLARE_CLASS(QPushButton);
 QT_FORWARD_DECLARE_CLASS(QTableWidget);
@@ -31,6 +32,7 @@ private:
 
     QSpinBox *m_nSpinBox;
     QPushButton *m_updateButton;
+    QTextEdit* m_summaryText;
 
     QTabWidget *m_chartsTabWidget;
     QTabWidget *m_tablesTabWidget;
@@ -63,6 +65,7 @@ private:
     void updateCoeffTable();
     void updateErrorTables();
     void updateCombinedDerivativesTable();
+    void updateSummary();
     void setupAxes(QChart* chart);
 
 };

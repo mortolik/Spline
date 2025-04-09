@@ -1,4 +1,6 @@
+#include <cmath>
 #include <QSpinBox>
+#include <QTextEdit>
 #include <QHeaderView>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -22,15 +24,21 @@ CubicSplineWidget::CubicSplineWidget(QWidget *parent)
     m_nSpinBox->setMaximumWidth(150);
     m_nSpinBox->setRange(2, 10000);
     m_nSpinBox->setValue(4);
+    m_summaryText = new QTextEdit(this);
+    m_summaryText->setFixedHeight(200);
+    m_summaryText->setReadOnly(true);
 
     m_updateButton = new QPushButton("Построить сплайн", this);
     controlLayout->addWidget(m_nSpinBox);
     controlLayout->addWidget(m_updateButton);
     mainLayout->addLayout(controlLayout);
 
+    QHBoxLayout* infoLayout = new QHBoxLayout();
     m_chartsTabWidget = new QTabWidget(this);
     createCharts();
-    mainLayout->addWidget(m_chartsTabWidget);
+    infoLayout->addWidget(m_chartsTabWidget);
+    infoLayout->addWidget(m_summaryText, 0, Qt::AlignTop);
+    mainLayout->addLayout(infoLayout);
 
     m_tablesTabWidget = new QTabWidget(this);
     m_coeffTable = new QTableWidget(this);
@@ -110,6 +118,7 @@ void CubicSplineWidget::setModel(CubicSplineModel *model)
                 updateCoeffTable();
                 updateErrorTables();                
                 updateCombinedDerivativesTable();
+                updateSummary();
             });
     updateCharts();
 }
@@ -316,6 +325,43 @@ void CubicSplineWidget::updateCombinedDerivativesTable()
         m_combinedDerivativesTable->setItem(j, 8, new QTableWidgetItem(QString::number(SxSecondDeriv)));
         m_combinedDerivativesTable->setItem(j, 9, new QTableWidgetItem(QString::number(DiffSecondDeriv)));
     }
+}
+
+void CubicSplineWidget::updateSummary()
+{
+    if (!m_splineModel) return;
+
+    int n = m_nSpinBox->value();
+    int N = 400;
+    double a = m_splineModel->getIntervalA();
+    double b = m_splineModel->getIntervalB();
+    double step = (b - a) / N;
+
+    double maxError = 0.0, maxErrorX = a;
+    double maxErrorDeriv = 0.0, maxErrorDerivX = a;
+    double maxErrorSecondDeriv = 0.0, maxErrorSecondDerivX = a;
+
+    for (int j = 0; j <= N; ++j)
+    {
+        double x = a + j * step;
+
+        double err = fabs(m_splineModel->function(x) - m_splineModel->evaluate(x));
+        double errDeriv = fabs(m_splineModel->functionDerivative(x) - m_splineModel->evaluateDerivative(x));
+        double errSecond = fabs(m_splineModel->functionSecondDerivative(x) - m_splineModel->evaluateSecondDerivative(x));
+
+        if (err > maxError) { maxError = err; maxErrorX = x; }
+        if (errDeriv > maxErrorDeriv) { maxErrorDeriv = errDeriv; maxErrorDerivX = x; }
+        if (errSecond > maxErrorSecondDeriv) { maxErrorSecondDeriv = errSecond; maxErrorSecondDerivX = x; }
+    }
+
+    QString summary;
+    summary += QString("Сетка сплайна: n = %1\n").arg(n);
+    summary += QString("Контрольная сетка: N = %1\n\n").arg(N);
+    summary += QString("Погрешность сплайна: %1 при x = %2\n").arg(maxError, 0, 'e', 6).arg(maxErrorX);
+    summary += QString("Погрешность производной: %1 при x = %2\n").arg(maxErrorDeriv, 0, 'e', 6).arg(maxErrorDerivX);
+    summary += QString("Погрешность второй производной: %1 при x = %2\n").arg(maxErrorSecondDeriv, 0, 'e', 6).arg(maxErrorSecondDerivX);
+
+    m_summaryText->setText(summary);
 }
 
 void CubicSplineWidget::createCharts()
