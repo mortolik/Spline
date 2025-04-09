@@ -43,6 +43,7 @@ CubicSplineWidget::CubicSplineWidget(QWidget *parent)
     m_tablesTabWidget->addTab(m_errorTable, "Погрешности функции");
     m_tablesTabWidget->addTab(m_errorDerivTable, "Погрешности производной");
     m_tablesTabWidget->addTab(m_errorSecondDerivTable, "Погрешности второй производной");
+    m_tablesTabWidget->addTab(m_combinedDerivativesTable, "Общая таблица производных");
     mainLayout->addWidget(m_tablesTabWidget);
 
     setLayout(mainLayout);
@@ -67,6 +68,15 @@ void CubicSplineWidget::setupTables()
     m_errorSecondDerivTable->setColumnCount(4);
     m_errorSecondDerivTable->setHorizontalHeaderLabels({"x", "F''(x)", "S''(x)", "F''(x)-S''(x)"});
     m_errorSecondDerivTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    m_combinedDerivativesTable = new QTableWidget(this);
+    m_combinedDerivativesTable->setColumnCount(10);
+    m_combinedDerivativesTable->setHorizontalHeaderLabels({
+        "x", "F(x)", "S(x)", "F(x)-S(x)",
+        "F'(x)", "S'(x)", "F'(x)-S'(x)",
+        "F''(x)", "S''(x)", "F''(x)-S''(x)"
+    });
+    m_combinedDerivativesTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 }
 
 void CubicSplineWidget::clearCharts()
@@ -98,7 +108,8 @@ void CubicSplineWidget::setModel(CubicSplineModel *model)
             {
                 updateCharts();
                 updateCoeffTable();
-                updateErrorTables();
+                updateErrorTables();                
+                updateCombinedDerivativesTable();
             });
     updateCharts();
 }
@@ -263,6 +274,47 @@ void CubicSplineWidget::updateErrorTables()
         m_errorSecondDerivTable->setItem(j, 1, new QTableWidgetItem(QString::number(F_second_deriv)));
         m_errorSecondDerivTable->setItem(j, 2, new QTableWidgetItem(QString::number(S_second_deriv)));
         m_errorSecondDerivTable->setItem(j, 3, new QTableWidgetItem(QString::number(F_second_deriv - S_second_deriv)));
+    }
+}
+
+void CubicSplineWidget::updateCombinedDerivativesTable()
+{
+    if (!m_splineModel) return;
+
+    int N = 400;
+    double a = m_splineModel->getIntervalA();
+    double b = m_splineModel->getIntervalB();
+    double step = (b - a) / N;
+
+    m_combinedDerivativesTable->setRowCount(N + 1);
+    m_combinedDerivativesTable->clearContents();
+
+    for (int j = 0; j <= N; ++j)
+    {
+        double x = a + j * step;
+
+        double Fx = m_splineModel->function(x);
+        double Sx = m_splineModel->evaluate(x);
+        double Fx_Sx = Fx - Sx;
+
+        double FxDeriv = m_splineModel->functionDerivative(x);
+        double SxDeriv = m_splineModel->evaluateDerivative(x);
+        double DiffDeriv = FxDeriv - SxDeriv;
+
+        double FxSecondDeriv = m_splineModel->functionSecondDerivative(x);
+        double SxSecondDeriv = m_splineModel->evaluateSecondDerivative(x);
+        double DiffSecondDeriv = FxSecondDeriv - SxSecondDeriv;
+
+        m_combinedDerivativesTable->setItem(j, 0, new QTableWidgetItem(QString::number(x)));
+        m_combinedDerivativesTable->setItem(j, 1, new QTableWidgetItem(QString::number(Fx)));
+        m_combinedDerivativesTable->setItem(j, 2, new QTableWidgetItem(QString::number(Sx)));
+        m_combinedDerivativesTable->setItem(j, 3, new QTableWidgetItem(QString::number(Fx_Sx)));
+        m_combinedDerivativesTable->setItem(j, 4, new QTableWidgetItem(QString::number(FxDeriv)));
+        m_combinedDerivativesTable->setItem(j, 5, new QTableWidgetItem(QString::number(SxDeriv)));
+        m_combinedDerivativesTable->setItem(j, 6, new QTableWidgetItem(QString::number(DiffDeriv)));
+        m_combinedDerivativesTable->setItem(j, 7, new QTableWidgetItem(QString::number(FxSecondDeriv)));
+        m_combinedDerivativesTable->setItem(j, 8, new QTableWidgetItem(QString::number(SxSecondDeriv)));
+        m_combinedDerivativesTable->setItem(j, 9, new QTableWidgetItem(QString::number(DiffSecondDeriv)));
     }
 }
 

@@ -38,6 +38,8 @@ private:
     QTableWidget *m_errorTable;
     QTableWidget *m_errorDerivTable;
     QTableWidget *m_errorSecondDerivTable;
+    QTableWidget* m_combinedDerivativesTable;
+
 
     QtCharts::QChart *m_chart;
     QtCharts::QChart *m_chartDeriv;
@@ -60,6 +62,7 @@ private:
     void updateCharts();
     void updateCoeffTable();
     void updateErrorTables();
+    void updateCombinedDerivativesTable();
     void setupAxes(QChart* chart);
 
 };
