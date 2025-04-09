@@ -202,6 +202,7 @@ void CubicSplineWidget::updateCoeffTable()
 
     int n = b.size();
     m_coeffTable->setRowCount(n);
+    m_coeffTable->clearContents();
 
     for (int i = 0; i < n; ++i)
     {
@@ -209,9 +210,19 @@ void CubicSplineWidget::updateCoeffTable()
         m_coeffTable->setItem(i, 1, new QTableWidgetItem(QString::number(xValues[i])));
         m_coeffTable->setItem(i, 2, new QTableWidgetItem(QString::number(xValues[i + 1])));
         m_coeffTable->setItem(i, 3, new QTableWidgetItem(QString::number(a[i + 1])));
-        m_coeffTable->setItem(i, 4, new QTableWidgetItem(QString::number(b[i])));
-        m_coeffTable->setItem(i, 5, new QTableWidgetItem(QString::number(c[i+1])));
-        m_coeffTable->setItem(i, 6, new QTableWidgetItem(QString::number(d[i])));
+
+        if (i + 1 < b.size())
+        {
+            m_coeffTable->setItem(i, 4, new QTableWidgetItem(QString::number(b[i + 1], 'f', 6)));
+        }
+        else
+        {
+            double derivAtLast = m_splineModel->functionDerivative(xValues[i + 1]);
+            m_coeffTable->setItem(i, 4, new QTableWidgetItem(QString::number(derivAtLast, 'f', 6)));
+        }
+
+        m_coeffTable->setItem(i, 5, new QTableWidgetItem(QString::number(c[i + 1], 'f', 6)));
+        m_coeffTable->setItem(i, 6, new QTableWidgetItem(QString::number(d[i], 'f', 6)));
     }
 }
 
